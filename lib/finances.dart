@@ -72,6 +72,8 @@ class FinancesPage extends StatefulWidget {
 class _FinancesPageState extends State<FinancesPage> {
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
   String _text = "TEXT";
+  List<OcrText> texts = [];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -79,9 +81,18 @@ class _FinancesPageState extends State<FinancesPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            _text,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Expanded(
+            child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(8),
+                itemCount: texts.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    height: 50,
+                    child: Center(child: Text(texts[index].value)),
+                  );
+                }),
           ),
           Center(
             child: RaisedButton(
@@ -98,18 +109,19 @@ class _FinancesPageState extends State<FinancesPage> {
   }
 
   Future<Null> _read() async {
-    List<OcrText> texts = [];
     try {
-      texts = await FlutterMobileVision.read(
+      List<OcrText> localtexts = await FlutterMobileVision.read(
         camera: _ocrCamera,
-        waitTap: true,
+        multiple: true,
+        autoFocus: true,
+        flash: true,
+        waitTap: false,
+        showText: false,
+        fps: 30.0
       );
-      setState(() {
-        _text = texts[0].value;
-        print(texts);
-      });
+      setState(() => texts = localtexts);
     } on Exception {
-      texts.add(OcrText('Failed to recognize text'));
+      print("du bist so dumm");
     }
   }
 }
