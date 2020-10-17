@@ -51,14 +51,12 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
-
-
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  void _onItemTap(int index){
+  void _onItemTap(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -66,7 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> list = [new CleanPage(), new FinancesPage(), new ShoppingPage()];
+    List<Widget> list = [
+      new CleanPage(),
+      new FinancesPage(),
+      new ShoppingPage()
+    ];
 
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -83,17 +85,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: list[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.house), label: 'Putzen'),
+          BottomNavigationBarItem(icon: Icon(Icons.euro), label: 'Finanzen'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.house),
-            label: 'Putzen'
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.euro),
-              label: 'Finanzen'
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart),
-              label: 'Einkaufen',
+            icon: Icon(Icons.shopping_cart),
+            label: 'Einkaufen',
           ),
         ],
         currentIndex: _selectedIndex,
