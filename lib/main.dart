@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> list = [
       new CleanPage(),
       new FinancesPage(),
-      new ShoppingPage()
+      new ShoppingPage(),
     ];
 
     // This method is rerun every time setState is called, for instance as done

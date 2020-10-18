@@ -22,6 +22,8 @@ environment:
 
 dependencies:
   flutter_mobile_vision: ^0.1.4+1
+  tesseract_ocr: ^0.3.0
+  path: ^1.7.0
   flutter:
     sdk: flutter
 
@@ -39,7 +41,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - lib/bill.png
+    - lib/bill.jpg
+    - lib/bill2.jpg
+    - assets/
+    - assets/tessdata/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
