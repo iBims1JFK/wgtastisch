@@ -60,9 +60,11 @@
 // }
 
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 
 class FinancesPage extends StatefulWidget {
   @override
@@ -76,27 +78,49 @@ class _FinancesPageState extends State<FinancesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final File imageFile = File('./assets/bill.jpeg');
+    final FirebaseVisionImage visionImage =
+        FirebaseVisionImage.fromFile(imageFile);
+    final TextRecognizer textRecognizer =
+        FirebaseVision.instance.textRecognizer();
+
+    _getText() async {
+      final VisionText visionText =
+          await textRecognizer.processImage(visionImage);
+
+      String text = visionText.text;
+      print(text);
+    }
+
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(
-            child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(8),
-                itemCount: texts.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 50,
-                    child: Center(child: Text(texts[index].value)),
-                  );
-                }),
+          // Expanded(
+          //   child: ListView.builder(
+          //       scrollDirection: Axis.vertical,
+          //       shrinkWrap: true,
+          //       padding: const EdgeInsets.all(8),
+          //       itemCount: texts.length,
+          //       itemBuilder: (BuildContext context, int index) {
+          //         return Container(
+          //           height: 50,
+          //           child: Center(child: Text(texts[index].language)),
+          //         );
+          //       }),
+          // ),
+          Container(
+            decoration: new BoxDecoration(
+              image: new DecorationImage(
+                image: new AssetImage('./assets/asdf.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           Center(
             child: RaisedButton(
-              onPressed: _read,
+              onPressed: _getText,
               child: Text(
                 'Scanning',
                 style: TextStyle(fontSize: 16),
@@ -117,7 +141,6 @@ class _FinancesPageState extends State<FinancesPage> {
         flash: true,
         waitTap: false,
         showText: false,
-        fps: 30.0
       );
       setState(() => texts = localtexts);
     } on Exception {

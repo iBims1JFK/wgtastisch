@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'shopping.dart';
 import 'finances.dart';
 import 'clean.dart';
-import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,6 +11,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    imageCache.clear();
     return MaterialApp(
       title: 'WGtastisch',
       theme: ThemeData(
