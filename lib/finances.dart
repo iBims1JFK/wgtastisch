@@ -65,6 +65,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
+import 'package:image_picker/image_picker.dart';
 
 class FinancesPage extends StatefulWidget {
   @override
@@ -76,22 +77,40 @@ class _FinancesPageState extends State<FinancesPage> {
   String _text = "TEXT";
   List<OcrText> texts = [];
 
+  File _image;
+  final TextRecognizer textRecognizer =
+      FirebaseVision.instance.textRecognizer();
+  FirebaseVisionImage visionImage;
+
+  final picker = ImagePicker();
+
+  Future<String> _getImageString(File image) async {
+    String lul = await image.readAsString();
+    return lul;
+  }
+
+  Future _getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        visionImage = FirebaseVisionImage.fromFile(_image);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  void _getText() async {
+    final VisionText visionText =
+        await textRecognizer.processImage(visionImage);
+    String text = visionText.text;
+    print(text);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final File imageFile = File('./assets/bill.jpeg');
-    final FirebaseVisionImage visionImage =
-        FirebaseVisionImage.fromFile(imageFile);
-    final TextRecognizer textRecognizer =
-        FirebaseVision.instance.textRecognizer();
-
-    _getText() async {
-      final VisionText visionText =
-          await textRecognizer.processImage(visionImage);
-
-      String text = visionText.text;
-      print(text);
-    }
-
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -110,21 +129,19 @@ class _FinancesPageState extends State<FinancesPage> {
           //         );
           //       }),
           // ),
-          Container(
-            decoration: new BoxDecoration(
-              image: new DecorationImage(
-                image: new AssetImage('./assets/asdf.png'),
-                fit: BoxFit.cover,
-              ),
+          _image == null ? Text('No image selected.') : Image.file(_image),
+          RaisedButton(
+            onPressed: _getImage,
+            child: Text(
+              'Pick Image',
+              style: TextStyle(fontSize: 16),
             ),
           ),
-          Center(
-            child: RaisedButton(
-              onPressed: _getText,
-              child: Text(
-                'Scanning',
-                style: TextStyle(fontSize: 16),
-              ),
+          RaisedButton(
+            onPressed: _getText,
+            child: Text(
+              'Perform Scan',
+              style: TextStyle(fontSize: 16),
             ),
           ),
         ],

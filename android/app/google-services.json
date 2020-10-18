@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "331058131448",
+    "firebase_url": "https://textrecog-6664c.firebaseio.com",
+    "project_id": "textrecog-6664c",
+    "storage_bucket": "textrecog-6664c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:331058131448:android:deb63835f3022d931f660d",
+        "android_client_info": {
+          "package_name": "com.example.wgtastisch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "331058131448-at3lu4pnn5u4er2a7nbfirgf97ie5gtq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQ88_S3WkGOGh7r6VfWqr1FOhreGLn1do"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "331058131448-at3lu4pnn5u4er2a7nbfirgf97ie5gtq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
