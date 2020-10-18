@@ -64,9 +64,15 @@ class _ShoppingPageState extends State<ShoppingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-                child: Text('Detected Text: $CartItems[0]\n'),
-     // child: CartItemList(),
+    return Column(
+      children: [
+        Container(
+                    child: Text('Detected Text: $CartItems[0]\n'),
+
+         // child: CartItemList(),
+        ),
+        Image.asset('lib/bill.jpg'),
+      ],
     );
   }
 }
