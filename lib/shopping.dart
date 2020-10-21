@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:tesseract_ocr/tesseract_ocr.dart';
-import 'Widgets/CartList.dart';
+import 'dart:developer';
+
+//import 'Widgets/CartList.dart';
 import 'package:xml/xml.dart';
 
 class ShoppingPage extends StatefulWidget {
@@ -36,9 +38,8 @@ class _ShoppingPageState extends State<ShoppingPage> {
     return double.parse(s, (e) => null) != null;
   }
 
-  void getRelevantInformation(List<String> fullStrings) {
+  void tokenization(List<String> fullStrings) {
     List<List<String>> splitedStrings = [];
-    List<String> Product = [];
     List<double> Price = [];
     final builder = XmlBuilder();
     builder.processing('xml', 'version="1.0"');
@@ -48,32 +49,36 @@ class _ShoppingPageState extends State<ShoppingPage> {
       splitedStrings.add(e.split(" "));
     });
     for (int l = 0; l < splitedStrings.length; l++) {
+      String last = null;
+      String type = "flawed";
       builder.element(l.toString(), nest: () {
         for (int i = 0; i < splitedStrings[l].length; i++) {
           String word = splitedStrings[l][i].toString();
           if (new RegExp(r"(\d*)(,)(\d*)").hasMatch(word)) {
-            double price =
-                double.parse(word.replaceAll("/", "7").replaceAll(",", "."));
-            Price.add(price);
-            builder.element("price", nest: word.replaceAll("/", "7"));
+            last = "price";
           } else if (isNumeric(word)) {
-            builder.element("product ID", nest: word.toString());
+            last = "product id";
           } else if (word == "EUR") {
-            builder.element("EUR", nest: word);
-          } else if (new RegExp("^A?|^B?|^(1)?|^(2)?|^1?|^2?|^5?|^7?|^16?|^19?").hasMatch(word)){
-            builder.element("Tax", nest: word);
+            type = "eur";
+            last = "eur";
+          } else if (new RegExp("^A\$|^B\$|^\(1\)\$|^(2)\$|^1\$|^2\$|^5\$|^7\$|^16\$|^19\$").hasMatch(word)) {
+            type = "normal";
+            last = "tax";
+          } else if (new RegExp("^kg\$").hasMatch(word) && last == "price"){
+            type = "weight";
+            last = "eur/kg";
           } else {
-            builder.element("product Name", nest: word.toString());
+            last = "product name";
           }
+          builder.element(last, nest: word);
         }
+        builder.attribute("type", type);
       });
     }
     final products = builder.buildDocument();
-    print(products.toXmlString(pretty: true));
-    print(Product.length);
-    print(Price.length);
+    log(products.toXmlString(pretty: true));
+    print(Price);
 
-    this.product = Product;
     this.price = Price;
   }
 
@@ -103,9 +108,9 @@ class _ShoppingPageState extends State<ShoppingPage> {
     // setState to update our non-existent appearance.
     // setState to update our non-existent appearance.
     if (!mounted) return;
-    print(extractText.length);
+    //print(extractText.length);
     CartItems = extractText.split('\n');
-    getRelevantInformation(CartItems);
+    tokenization(CartItems);
     setState(() {
       _extractText = extractText;
     });
@@ -126,7 +131,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
         BackButton(),
         OutlineButton(onPressed: null, child: Text("speichern")),
         Text(total()),
-        CartList(product, price),
+       // CartList(product, price),
         Image.asset('lib/bill.jpg'),
       ],
     );
