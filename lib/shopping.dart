@@ -10,6 +10,7 @@ import 'dart:async';
 
 import 'package:tesseract_ocr/tesseract_ocr.dart';
 import 'Widgets/CartList.dart';
+import 'package:xml/xml.dart';
 
 class ShoppingPage extends StatefulWidget {
   @override
@@ -39,51 +40,36 @@ class _ShoppingPageState extends State<ShoppingPage> {
     List<List<String>> splitedStrings = [];
     List<String> Product = [];
     List<double> Price = [];
-    RegExp regExp = new RegExp(
-      r"(\d*)(,)(\d*)"
-    );
+    final builder = XmlBuilder();
+    builder.processing('xml', 'version="1.0"');
+    final test = builder.buildDocument();
 
     fullStrings.forEach((e) {
       splitedStrings.add(e.split(" "));
     });
     for (int l = 0; l < splitedStrings.length; l++) {
-      bool foundProduct = false;
-      bool foundPrice = false;
-      List<String> elementsToDelete = [];
-      for (int i = 0; i < splitedStrings[l].length; i++) {
-        if (!foundProduct) {
-          if (isNumeric(splitedStrings[l][i])) {
-            elementsToDelete.add(splitedStrings[l][i]);
+      builder.element(l.toString(), nest: () {
+        for (int i = 0; i < splitedStrings[l].length; i++) {
+          String word = splitedStrings[l][i].toString();
+          if (new RegExp(r"(\d*)(,)(\d*)").hasMatch(word)) {
+            double price =
+                double.parse(word.replaceAll("/", "7").replaceAll(",", "."));
+            Price.add(price);
+            builder.element("price", nest: word.replaceAll("/", "7"));
+          } else if (isNumeric(word)) {
+            builder.element("product ID", nest: word.toString());
+          } else if (word == "EUR") {
+            builder.element("EUR", nest: word);
+          } else if (new RegExp("^A?|^B?|^(1)?|^(2)?|^1?|^2?|^5?|^7?|^16?|^19?").hasMatch(word)){
+            builder.element("Tax", nest: word);
           } else {
-            foundProduct = true;
+            builder.element("product Name", nest: word.toString());
           }
         }
-        if (!foundPrice) {
-          if (regExp.hasMatch(splitedStrings[l][i])) {
-            foundPrice = true;
-            // Price.add(double.parse(splitedStrings[l][i].replaceAll(",", ".")));
-            //nicht alles muss ein double sein
-            Price.add(double.parse(splitedStrings[l][i].replaceAll("/", "7").replaceAll(",", ".")));
-            elementsToDelete.add(splitedStrings[l][i]);
-          }
-        } else {
-          elementsToDelete.add(splitedStrings[l][i]);
-        }
-      }
-      if(foundPrice && foundProduct){
-        for (String s in elementsToDelete) {
-          splitedStrings[l].remove(s);
-        }
-      } else {
-        splitedStrings[l].removeWhere((element) => true);
-      }
-
+      });
     }
-    for (int l = 0; l < splitedStrings.length; l++) {
-      if(splitedStrings[l].isNotEmpty){
-        Product.add(splitedStrings[l].toString().replaceAll(",", "").replaceAll("[", "").replaceAll("]", ""));
-      }
-    }
+    final products = builder.buildDocument();
+    print(products.toXmlString(pretty: true));
     print(Product.length);
     print(Price.length);
 
@@ -117,6 +103,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
     // setState to update our non-existent appearance.
     // setState to update our non-existent appearance.
     if (!mounted) return;
+    print(extractText.length);
     CartItems = extractText.split('\n');
     getRelevantInformation(CartItems);
     setState(() {
@@ -124,14 +111,22 @@ class _ShoppingPageState extends State<ShoppingPage> {
     });
   }
 
+  String total() {
+    double totalAmount = 0;
+    for (double e in price) {
+      totalAmount += e;
+    }
+    return totalAmount.toString().replaceAll(".", ",");
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Wrap(
       children: [
-        Container(
-          // child: Text('Detected Text: $CartItems[0]\n'),
-          child: CartList(product, price),
-        ),
+        BackButton(),
+        OutlineButton(onPressed: null, child: Text("speichern")),
+        Text(total()),
+        CartList(product, price),
         Image.asset('lib/bill.jpg'),
       ],
     );
